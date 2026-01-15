@@ -1,0 +1,25 @@
+# Dependências
+node_modules/
+
+# Builds
+dist/
+build/
+.quasar/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.cache/
+.eslintcache
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db

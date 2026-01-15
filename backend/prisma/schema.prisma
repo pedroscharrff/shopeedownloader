@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanType {
+  FREE
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum DownloadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  ACTIVE
+  EXPIRED
+}
+
+enum PaymentType {
+  CHARGE
+  SUBSCRIPTION
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  passwordHash   String   @map("password_hash")
+  planType       PlanType @default(FREE) @map("plan_type")
+  emailVerified  Boolean  @default(false) @map("email_verified")
+  totalDownloads Int      @default(0) @map("total_downloads")
+  lastLogin      DateTime? @map("last_login")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  subscriptions Subscription[]
+  downloads     Download[]
+  payments      Payment[]
+  dailyLimits   DailyLimit[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id                    String             @id @default(uuid())
+  userId                String             @map("user_id")
+  planType              PlanType           @map("plan_type")
+  status                SubscriptionStatus @default(ACTIVE)
+  startedAt             DateTime           @default(now()) @map("started_at")
+  expiresAt             DateTime?          @map("expires_at")
+  autoRenew             Boolean            @default(true) @map("auto_renew")
+  openpixSubscriptionId String?            @unique @map("openpix_subscription_id") @db.VarChar(255)
+  openpixGlobalId       String?            @unique @map("openpix_global_id") @db.VarChar(255)
+  dayGenerateCharge     Int?               @map("day_generate_charge")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@map("subscriptions")
+}
+
+model Download {
+  id              String         @id @default(uuid())
+  userId          String         @map("user_id")
+  videoUrl        String         @map("video_url") @db.Text
+  videoTitle      String?        @map("video_title") @db.VarChar(500)
+  videoDuration   Int?           @map("video_duration")
+  videoResolution String?        @map("video_resolution") @db.VarChar(20)
+  fileSize        BigInt?        @map("file_size")
+  filePath        String?        @map("file_path") @db.Text
+  status          DownloadStatus @default(PENDING)
+  errorMessage    String?        @map("error_message") @db.Text
+  downloadedAt    DateTime?      @map("downloaded_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("downloads")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  userId            String        @map("user_id")
+  subscriptionId    String?       @map("subscription_id")
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("BRL") @db.VarChar(3)
+  status            PaymentStatus @default(PENDING)
+  paymentMethod     String?       @map("payment_method") @db.VarChar(50)
+  transactionId     String?       @unique @map("transaction_id") @db.VarChar(255)
+  paymentType       PaymentType   @default(CHARGE) @map("payment_type")
+  openpixChargeId   String?       @unique @map("openpix_charge_id") @db.VarChar(255)
+  openpixGlobalId   String?       @unique @map("openpix_global_id") @db.VarChar(255)
+  correlationId     String?       @unique @map("correlation_id") @db.VarChar(255)
+  brCode            String?       @map("br_code") @db.Text
+  qrCodeImage       String?       @map("qr_code_image") @db.Text
+  paymentLinkUrl    String?       @map("payment_link_url") @db.Text
+  expiresAt         DateTime?     @map("expires_at")
+  paidAt            DateTime?     @map("paid_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@map("payments")
+}
+
+model DailyLimit {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  date           DateTime @db.Date
+  downloadsCount Int      @default(0) @map("downloads_count")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_limits")
+}
+
+model BlockedEmail {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  reason    String   @default("account_deleted") @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("blocked_emails")
+}
