@@ -6,7 +6,7 @@ import { SubscriptionStatus } from '@prisma/client';
 
 export const checkActiveSubscription = async (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
@@ -63,7 +63,7 @@ export const checkActiveSubscription = async (
 
 export const checkPremiumPlan = async (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   try {

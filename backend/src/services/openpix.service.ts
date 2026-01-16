@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-interface OpenPixCustomer {
+export interface OpenPixCustomer {
   name: string;
   taxID: string;
   email: string;
@@ -196,8 +196,8 @@ class OpenPixService {
   }
 
   async createRecurringSubscription(
-    userId: string,
-    planType: 'PREMIUM',
+    _userId: string,
+    _planType: 'PREMIUM',
     customer: OpenPixCustomer,
     dayGenerateCharge: number = 5
   ): Promise<CreateSubscriptionResponse> {

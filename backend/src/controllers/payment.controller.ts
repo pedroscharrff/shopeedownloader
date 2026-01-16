@@ -148,7 +148,7 @@ export const handleWebhook = async (req: Request, res: Response, next: NextFunct
       }
     }
 
-    res.json({ 
+    return res.json({ 
       success: true,
       message: 'Webhook recebido',
     });
@@ -184,7 +184,7 @@ export const getActiveSubscription = async (req: AuthRequest, res: Response, nex
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       subscription,
     });
@@ -236,7 +236,7 @@ export const getUpcomingInvoices = async (req: AuthRequest, res: Response, next:
       }
     }
 
-    res.json({
+    return res.json({
       success: true,
       upcomingInvoices,
     });
