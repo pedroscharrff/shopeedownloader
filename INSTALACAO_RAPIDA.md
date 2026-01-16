@@ -10,7 +10,7 @@ Conecte-se à sua VPS via SSH e execute:
 
 ```bash
 # Baixar script de setup
-wget https://raw.githubusercontent.com/SEU_USUARIO/shopee/main/setup-vps.sh
+wget https://raw.githubusercontent.com/pedroscharrff/shopeedownloader/main/setup-vps.sh
 
 # Executar setup inicial
 sudo bash setup-vps.sh
@@ -23,8 +23,8 @@ exit
 
 ```bash
 # Clonar projeto
-git clone https://github.com/SEU_USUARIO/shopee.git
-cd shopee
+git clone git@github.com:pedroscharrff/shopeedownloader.git
+cd shopeedownloader
 ```
 
 ### 3️⃣ Instalar e Configurar

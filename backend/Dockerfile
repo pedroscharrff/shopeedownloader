@@ -14,8 +14,8 @@ RUN apk add --no-cache \
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalar dependências com configurações otimizadas
-RUN npm ci --only=production=false --no-audit --no-fund
+# Instalar todas as dependências (incluindo devDependencies para o build)
+RUN npm ci --no-audit --no-fund
 
 # Gerar o cliente Prisma antes do build
 RUN npx prisma generate
@@ -23,8 +23,8 @@ RUN npx prisma generate
 # Copiar código fonte
 COPY . .
 
-# Buildar a aplicação TypeScript
-RUN npm run build
+# Buildar a aplicação TypeScript com logs detalhados
+RUN npm run build || (echo "Build failed. Checking TypeScript errors:" && npx tsc --noEmit && exit 1)
 
 # Remover devDependencies para reduzir tamanho da imagem
 RUN npm prune --production
