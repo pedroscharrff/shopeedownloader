@@ -1,17 +1,20 @@
 import jwt from 'jsonwebtoken';
 
 export const generateAccessToken = (userId: string): string => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
-  });
+  const secret = process.env.JWT_SECRET || '';
+  const expiresIn = process.env.JWT_EXPIRES_IN || '1h';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return jwt.sign({ userId }, secret, { expiresIn } as any);
 };
 
 export const generateRefreshToken = (userId: string): string => {
-  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET as string, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-  });
+  const secret = process.env.JWT_REFRESH_SECRET || '';
+  const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return jwt.sign({ userId }, secret, { expiresIn } as any);
 };
 
 export const verifyRefreshToken = (token: string): { userId: string } => {
-  return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as { userId: string };
+  const secret = process.env.JWT_REFRESH_SECRET || '';
+  return jwt.verify(token, secret) as { userId: string };
 };
