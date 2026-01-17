@@ -27,9 +27,11 @@ export function Dashboard() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    loadDownloads();
-    loadStats();
-  }, []);
+    if (user) {
+      loadDownloads();
+      loadStats();
+    }
+  }, [user]);
 
   const loadDownloads = async () => {
     try {
